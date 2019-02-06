@@ -10,6 +10,8 @@ Pose, pre-defined in the example code, printing the
 response of whether a valid joint solution was found,
 and if so, the corresponding joint angles.
 """
+import argparse
+
 # ROS Specific imports
 import rospy
 from geometry_msgs.msg import (
@@ -25,8 +27,9 @@ from sensor_msgs.msg import JointState
 from intera_core_msgs.srv import (
     SolvePositionIK,
     SolvePositionIKRequest,
-    JointCommand
 )
+
+from intera_core_msgs.msg import JointCommand
 
 # Dynamic reconfigure imports
 from dynamic_reconfigure.server import Server
@@ -41,35 +44,32 @@ class IkServiceClass:
     """
     def __init__(self):
         # Messages to set the goal position
+        self.seq = 1
         self.dyn_point = Point()
         self.dyn_quat = Quaternion()
         self.goal_pose = PoseStamped()
         self.joint_cmd = JointCommand()
+        self.joint_cmd.header.seq = self.seq
         self.joint_cmd.mode = JointCommand.POSITION_MODE
-        # Create the dyanmic reconfigure server
-        self.dyn_cfg_server = Server(WorkshopConfig, self.dyn_cfg_callback)
+        self._joint_names = ['right_j0', 'right_j1', 'right_j2', 'right_j3',
+                             'right_j4', 'right_j5', 'right_j6']
+        self.joint_cmd.names = self._joint_names
         # Create a publisher to send joint position commands
         self.joint_publisher = rospy.Publisher('/robot/limb/right/joint_command',
                                                JointCommand, queue_size=5)
+        # Wait for subscribers to listen
+        while self.joint_publisher.get_num_connections() == 0:
+            pass
 
     def dyn_cfg_callback(self, config, level):
         rospy.loginfo("Reconfigure Request: \nx: {x_goal}, y: {y_goal}, z: {z_goal}\n"
                       "ax: {ax_goal}, ay: {ay_goal}, az: {az_goal}".format(**config))
-        header = Header(stamp=rospy.Time.now(), frame_id='base')
         # Your code here
-        self.dyn_point.x = config.x_goal
-        self.dyn_point.y = config.y_goal
-        self.dyn_point.z = config.z_goal
-        self.dyn_quat.x = config.ax_goal
-        self.dyn_quat.y = config.ay_goal
-        self.dyn_quat.z = config.az_goal
-        self.dyn_quat.w = 0.00
-        pose = Pose(position=self.dyn_point, orientation=self.dyn_quat)
-        self.goal_pose = PoseStamped(header=header, pose=pose)
-        self.ik_service_client(goal=self.goal_pose)
+
         return config
 
     def ik_service_client(self, goal=None, limb="right", use_advanced_options=False):
+        # Setup for the service request
         ns = "ExternalTools/" + limb + "/PositionKinematicsNode/IKService"
         iksvc = rospy.ServiceProxy(ns, SolvePositionIK)
         ikreq = SolvePositionIKRequest()
@@ -127,6 +127,7 @@ class IkServiceClass:
         else:
             rospy.loginfo("Running Simple IK Service Client example.")
 
+        # Call the IK Service
         try:
             rospy.wait_for_service(ns, 5.0)
             resp = iksvc(ikreq)
@@ -144,6 +145,11 @@ class IkServiceClass:
             rospy.loginfo("SUCCESS - Valid Joint Solution Found from Seed Type: %s" %
                   (seed_str,))
             # Format solution into Limb API-compatible dictionary
+            self.joint_cmd.header.stamp = rospy.Time()
+            self.joint_cmd.names = resp.joints[0].name
+            self.joint_cmd.position = resp.joints[0].position
+            self.joint_publisher.publish(self.joint_cmd)
+            rospy.loginfo("Publishing Joint Message: {}".format(self.joint_cmd))
             limb_joints = dict(zip(resp.joints[0].name, resp.joints[0].position))
             rospy.loginfo("\nIK Joint Solution:\n%s", limb_joints)
             rospy.loginfo("------------------")
@@ -156,6 +162,7 @@ class IkServiceClass:
         return True
 
     def test_ik_service(self, advanced=False):
+        rospy.loginfo("Testing IK Service...")
         if self.ik_service_client(use_advanced_options=advanced):
             if advanced:
                 rospy.loginfo(rospy.loginfo("Advanced IK call passed!"))
@@ -167,16 +174,40 @@ class IkServiceClass:
             else:
                 rospy.logerr("Simple IK call FAILED")
 
+    def test_publisher(self):
+        rospy.loginfo("Testing publisher...")
+        self.joint_cmd.header = Header(seq=self.seq+1, stamp=rospy.Time.now())
+        self.joint_cmd.position = [0.5, 1.1, 0.0, 0.42, -0.8, -0.05, 0.02]
+        rospy.loginfo("Publishing joint command: {}".format(self.joint_cmd))
+        self.joint_publisher.publish(self.joint_cmd)
+
     def start_spinning(self):
+        # Create the dyanmic reconfigure server
+        dyn_cfg_server = Server(WorkshopConfig, self.dyn_cfg_callback)
         rospy.spin()
 
 
 if __name__ == '__main__':
+    # ===================================================================================
+    # Parse input arguments
+    arg_fmt = argparse.RawDescriptionHelpFormatter
+    parser = argparse.ArgumentParser(formatter_class=arg_fmt,
+                                     description="ROS Workshop IK Solver service")
+    parser.add_argument("-tp", "--testpub", action="store_true",
+                        help="Test the joint position publisher")
+    parser.add_argument("-ts", "--testsrv", action="store_true",
+                        help="Test the IK service call")
+    args = parser.parse_args(rospy.myargv()[1:])
+    # ===================================================================================
+
     # Create a ROS node
     rospy.init_node('workshop_ik_service')
     # Instantiate the class
     ik_service = IkServiceClass()
     # Test
-    ik_service.test_ik_service()
+    if args.testpub:
+        ik_service.test_publisher()
+    if args.testsrv:
+        ik_service.test_ik_service()
     # Run
-    # ik_service.start_spinning()
+    ik_service.start_spinning()

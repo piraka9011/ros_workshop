@@ -40,7 +40,7 @@ roslaunch sawyer_gazebo sawyer_world.launch
 
 Show the reconfigure GUI
 ```
-rosrun rqt_gui rqt_gui -s reconfigure
+rosrun rqt_reconfigure rqt_reconfigure
 ``` 
 
 ##### Hints
