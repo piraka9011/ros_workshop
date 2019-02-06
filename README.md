@@ -2,12 +2,12 @@
 
 ## Setup
 
-###### Prereqs
+#### Prereqs
 ```bash
 sudo apt-get install gazebo7 ros-kinetic-qt-build ros-kinetic-gazebo-ros-control ros-kinetic-gazebo-ros-pkgs ros-kinetic-ros-control ros-kinetic-control-toolbox ros-kinetic-realtime-tools ros-kinetic-ros-controllers ros-kinetic-xacro python-wstool ros-kinetic-tf-conversions ros-kinetic-kdl-parser ros-kinetic-sns-ik-lib python-rosinstall git-core python-argparse python-wstool python-vcstools python-rosdep ros-kinetic-control-msgs ros-kinetic-joystick-drivers ros-kinetic-xacro ros-kinetic-tf2-ros ros-kinetic-rviz ros-kinetic-cv-bridge ros-kinetic-actionlib ros-kinetic-actionlib-msgs ros-kinetic-dynamic-reconfigure ros-kinetic-trajectory-msgs ros-kinetic-rospy-message-converter
 ```
 
-###### First create a Catkin workspace
+#### First create a Catkin workspace
 ```bash
 cd ~/
 mkdir -p catkin_ws/src
@@ -17,7 +17,7 @@ cd ..
 catkin build
 ```
 
-###### Now clone the sawyer simulator repo
+#### Now clone the sawyer simulator repo
 
 ```bash
 cd ~/catkin_ws/src
@@ -36,14 +36,14 @@ roslaunch sawyer_gazebo sawyer_world.launch
 
 ## Workshop
 
-###### Dynamic reconfigure
+#### Dynamic reconfigure
 
 Show the reconfigure GUI
 ```
 rosrun rqt_gui rqt_gui -s reconfigure
 ``` 
 
-#### Hints
+##### Hints
 - Source your workspace: `source ~/catkin_ws/devel/setup.bash`
 - Checking the robot state: `rostopic echo /robot/state`
 - Hello Robot!: `rosrun intera_examples joint_torque_springs.py`
