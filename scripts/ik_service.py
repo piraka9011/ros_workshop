@@ -65,7 +65,17 @@ class IkServiceClass:
         rospy.loginfo("Reconfigure Request: \nx: {x_goal}, y: {y_goal}, z: {z_goal}\n"
                       "ax: {ax_goal}, ay: {ay_goal}, az: {az_goal}".format(**config))
         # Your code here
-
+        self.dyn_point.x = config.x_goal
+        self.dyn_point.y = config.y_goal
+        self.dyn_point.z = config.z_goal
+        self.dyn_quat.x = config.ax_goal
+        self.dyn_quat.y = config.ay_goal
+        self.dyn_quat.z = config.az_goal
+        self.dyn_quat.w = 0.0
+        pose = Pose(position=self.dyn_point, orientation=self.dyn_quat)
+        header = Header(stamp=rospy.Time.now(), frame_id='base')
+        goal_pose = PoseStamped(header=header, pose=pose)
+        self.ik_service_client(goal=goal_pose)
         return config
 
     def ik_service_client(self, goal=None, limb="right", use_advanced_options=False):
