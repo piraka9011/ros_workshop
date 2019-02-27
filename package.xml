@@ -27,7 +27,6 @@
   <!--   <exec_depend>message_runtime</exec_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
   <depend>geometry_msgs</depend>
-  <depend>intera_core_msgs</depend>
   <depend>roscpp</depend>
   <depend>rospy</depend>
   <depend>sensor_msgs</depend>

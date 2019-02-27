@@ -7,7 +7,7 @@ if __name__ == '__main__':
     # Initialize the node
     rospy.init_node('simple_vel_cmd')
     # Create a publisher
-    vel_publiher = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+    vel_publisher = rospy.Publisher('/cmd_vel_mux/teleop', Twist, queue_size=10)
     # Create the twist message
     twist = Twist()
     twist.linear.x = 0.5

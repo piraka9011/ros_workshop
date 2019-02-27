@@ -4,7 +4,6 @@ project(ros_workshop)
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
-  intera_core_msgs
   roscpp
   rospy
   sensor_msgs
@@ -40,19 +39,17 @@ find_package(catkin REQUIRED COMPONENTS
 
 
 ## Generate services in the 'srv' folder
-add_service_files(
-  FILES
-  MyIkService.srv
-)
+#add_service_files(
+#  FILES
+#)
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  geometry_msgs
-  intera_core_msgs
-  sensor_msgs
-  std_msgs
-)
+#generate_messages(
+#  DEPENDENCIES
+#  geometry_msgs
+#  sensor_msgs
+#  std_msgs
+#)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -69,9 +66,9 @@ generate_messages(
 ##     and list every .cfg file to be processed
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
-generate_dynamic_reconfigure_options(
-  cfg/WorkshopConfig.cfg
-)
+#generate_dynamic_reconfigure_options(
+#  cfg/WorkshopConfig.cfg
+#)
 
 catkin_package()
 

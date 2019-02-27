@@ -60,7 +60,7 @@ rosrun <pkg_name> <file_name>
 ```
 for example
 ```
-rosrun mobile_robotics simple_vel_cmd.py
+rosrun ros_workshop simple_vel_cmd.py
 ```
  
 
