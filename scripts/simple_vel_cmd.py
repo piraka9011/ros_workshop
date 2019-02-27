@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
+import sys
 from geometry_msgs.msg import Twist
 
 if __name__ == '__main__':
