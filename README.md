@@ -1,5 +1,14 @@
 # EECE 5550: Turtlebot session
 
+## How To Use
+
+Navigate to your catkin workspace into the packages directory (`cd ~/catkin_ws/src`) and clone the repo directly there. 
+Make sure to switch to the `eece5550` branch.
+```
+git clone https://github.com/piraka9011/ros_workshop.git
+git checkout eece5550
+```
+
 ## Prereqs
 
 Make sure the turtlebot packages are installed
